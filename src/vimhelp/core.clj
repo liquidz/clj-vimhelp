@@ -3,9 +3,9 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [clojure.tools.cli :as cli]
+            [clojure.walk :as walk]
             [vimhelp.html :as h]
-            [vimhelp.parser :as p]
-            [clojure.walk :as walk]))
+            [vimhelp.parser :as p]))
 
 (def version
   (-> "version" io/resource slurp str/trim))
