@@ -1,4 +1,4 @@
-.PHONY: test ancient repl native-image clean
+.PHONY: test ancient repl native-image install uninstall clean
 
 test:
 	clojure -A:dev:test
@@ -9,11 +9,19 @@ ancient:
 repl:
 	iced repl --force-clojure-cli -A:dev
 
-native-image:
+target/vimhelp:
 	mkdir -p target && clojure -A:native-image
 
+native-image: target/vimhelp
+
+install: target/vimhelp
+	\cp -pf target/vimhelp /usr/local/bin
+
+uninstall: /usr/local/bin/vimhelp
+	\rm -f /usr/local/bin/vimhelp
+
 clean:
-	rm -rf .cpcache classes target
+	\rm -rf .cpcache classes target
 
 .vim-iced:
 	git clone https://github.com/liquidz/vim-iced .vim-iced
