@@ -39,13 +39,17 @@
   [[_ constant-name] _]
   [:span.constant (hiccup/h constant-name)])
 
-(defmethod render* :heading
-  [[_ heading-text] _]
-  [:span.heading (hiccup/h heading-text)])
+(defmethod render* :header
+  [[_ header-text] _]
+  [:span.header (hiccup/h header-text)])
 
-(defmethod render* :code-block
-  [[_ codes] _]
-  [:pre.code-block [:code (hiccup/h codes)]])
+(defmethod render* :command
+  [[_ command] _]
+  [:code.command (hiccup/h command)])
+
+(defmethod render* :example
+  [[_ example] _]
+  [:pre.example [:code (hiccup/h example)]])
 
 (defmethod render* :url
   [[_ url] _]

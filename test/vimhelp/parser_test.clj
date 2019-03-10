@@ -29,9 +29,9 @@
       "foo |bar baz",   [[:text "foo |bar baz"]]
       "foo |bar\nbaz|", [[:text "foo |bar"] [:text "baz|"]]))
 
-  (t/testing "texts with inline code"
+  (t/testing "texts with inline command"
     (t/are [in out] (= (parse in) out)
-      "foo `bar` baz",  [[:text "foo " [:code "bar"] " baz"]]
+      "foo `bar` baz",  [[:text "foo " [:command "bar"] " baz"]]
       "foo `bar baz",   [[:text "foo `bar baz"]]
       "foo `bar\nbaz`", [[:text "foo `bar"] [:text "baz`"]]))
 
@@ -41,7 +41,7 @@
       "foo {bar baz",      [[:text "foo {bar baz"]]
       "foo {bar\nbaz}",    [[:text "foo {bar"] [:text "baz}"]]
       "foo {{bar}} baz",   [[:text "foo {" [:constant "{bar}"] "} baz"]]
-      "foo `{{bar}}` baz", [[:text "foo " [:code "{{bar}}"] " baz"]]))
+      "foo `{{bar}}` baz", [[:text "foo " [:command "{{bar}}"] " baz"]]))
 
   (t/testing "texts with URL"
     (t/are [in out] (= (parse in) out)
@@ -49,44 +49,44 @@
       "foo https://example.com",     [[:text "foo " [:url "https://example.com"] ""]]
       "foo https://example.com bar", [[:text "foo " [:url "https://example.com"] " bar"]])))
 
-(t/deftest parse-code-block-test
+(t/deftest parse-example-test
   (t/testing "starts from line head"
     (t/testing "ends with '<'"
       (t/are [in out] (= (parse in) out)
-        ">\n foo\n bar\n<",        [[:code-block " foo\n bar"]]
-        ">\n foo\n bar\n<\nbaz",   [[:code-block " foo\n bar"] [:text "baz"]]
-        "foo\n>\n bar\n<\nbaz",    [[:text "foo"] [:code-block " bar"] [:text "baz"]]
-        ">\n\tfoo\n\tbar\n<",      [[:code-block "\tfoo\n\tbar"]]
-        ">\n\tfoo\n\tbar\n<\nbaz", [[:code-block "\tfoo\n\tbar"] [:text "baz"]]
-        ">\n<",                    [[:code-block ""] ]
-        "foo\n>\n<\nbar",          [[:text "foo"] [:code-block ""] [:text "bar"]]))
+        ">\n foo\n bar\n<",        [[:example " foo\n bar"]]
+        ">\n foo\n bar\n<\nbaz",   [[:example " foo\n bar"] [:text "baz"]]
+        "foo\n>\n bar\n<\nbaz",    [[:text "foo"] [:example " bar"] [:text "baz"]]
+        ">\n\tfoo\n\tbar\n<",      [[:example "\tfoo\n\tbar"]]
+        ">\n\tfoo\n\tbar\n<\nbaz", [[:example "\tfoo\n\tbar"] [:text "baz"]]
+        ">\n<",                    [[:example ""] ]
+        "foo\n>\n<\nbar",          [[:text "foo"] [:example ""] [:text "bar"]]))
 
     (t/testing "ends with some texts"
       (t/are [in out] (= (parse in) out)
-        ">\n foo\nbar",         [[:code-block " foo"] [:text "bar"]]
-        ">\n foo\n bar\nbaz",   [[:code-block " foo\n bar"] [:text "baz"]]
-        "foo\n>\n bar\nbaz",    [[:text "foo"] [:code-block " bar"] [:text "baz"]]
-        ">\n\tfoo\nbar",        [[:code-block "\tfoo"] [:text "bar"]]
-        ">\n\tfoo\n\tbar\nbaz", [[:code-block "\tfoo\n\tbar"] [:text "baz"]]
-        ">\nfoo",               [[:code-block ""] [:text "foo"]]
-        "foo\n>\nbar",          [[:text "foo"] [:code-block ""] [:text "bar"]])))
+        ">\n foo\nbar",         [[:example " foo"] [:text "bar"]]
+        ">\n foo\n bar\nbaz",   [[:example " foo\n bar"] [:text "baz"]]
+        "foo\n>\n bar\nbaz",    [[:text "foo"] [:example " bar"] [:text "baz"]]
+        ">\n\tfoo\nbar",        [[:example "\tfoo"] [:text "bar"]]
+        ">\n\tfoo\n\tbar\nbaz", [[:example "\tfoo\n\tbar"] [:text "baz"]]
+        ">\nfoo",               [[:example ""] [:text "foo"]]
+        "foo\n>\nbar",          [[:text "foo"] [:example ""] [:text "bar"]])))
 
   (t/testing "start from line tail"
     (t/testing "ends with '<'"
       (t/are [in out] (= (parse in) out)
-        "foo >\n bar\n<",       [[:text "foo"] [:code-block " bar"]]
-        "foo >\n bar\n baz\n<", [[:text "foo"] [:code-block " bar\n baz"]]
-        "foo >\n bar\n<\nbaz",  [[:text "foo"] [:code-block " bar"] [:text "baz"]]
-        "foo >\n\tbar\n<",      [[:text "foo"] [:code-block "\tbar"]]
-        "foo >\n<",             [[:text "foo"] [:code-block ""]]
-        "foo >\n<\nbar",        [[:text "foo"] [:code-block ""] [:text "bar"]]))
+        "foo >\n bar\n<",       [[:text "foo"] [:example " bar"]]
+        "foo >\n bar\n baz\n<", [[:text "foo"] [:example " bar\n baz"]]
+        "foo >\n bar\n<\nbaz",  [[:text "foo"] [:example " bar"] [:text "baz"]]
+        "foo >\n\tbar\n<",      [[:text "foo"] [:example "\tbar"]]
+        "foo >\n<",             [[:text "foo"] [:example ""]]
+        "foo >\n<\nbar",        [[:text "foo"] [:example ""] [:text "bar"]]))
     (t/testing "ends with some texts"
       (t/are [in out] (= (parse in) out)
-        "foo >\n bar\nbaz",         [[:text "foo"] [:code-block " bar"] [:text "baz"]]
-        "foo >\n bar\n baz\neot",   [[:text "foo"] [:code-block " bar\n baz"] [:text "eot"]]
-        "foo >\n\tbar\nbaz",        [[:text "foo"] [:code-block "\tbar"] [:text "baz"]]
-        "foo >\n\tbar\n\tbaz\neot", [[:text "foo"] [:code-block "\tbar\n\tbaz"] [:text "eot"]]
-        "foo >\nbar",               [[:text "foo"] [:code-block ""] [:text "bar"]])))
+        "foo >\n bar\nbaz",         [[:text "foo"] [:example " bar"] [:text "baz"]]
+        "foo >\n bar\n baz\neot",   [[:text "foo"] [:example " bar\n baz"] [:text "eot"]]
+        "foo >\n\tbar\nbaz",        [[:text "foo"] [:example "\tbar"] [:text "baz"]]
+        "foo >\n\tbar\n\tbaz\neot", [[:text "foo"] [:example "\tbar\n\tbaz"] [:text "eot"]]
+        "foo >\nbar",               [[:text "foo"] [:example ""] [:text "bar"]])))
 
   (t/testing "mismatched"
     (t/are [in out] (= (parse in) out)

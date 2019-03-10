@@ -24,15 +24,15 @@
 
 (def-inline-parser parse-tag #"\*([^*]+)\*" #(vector :tag %))
 (def-inline-parser parse-ref #"\|([^|]+)\|" #(vector :ref %))
-(def-inline-parser parse-code #"\`([^`]+)\`" #(vector :code %))
+(def-inline-parser parse-command #"\`([^`]+)\`" #(vector :command %))
 (def-inline-parser parse-const #"(\{[^{}]+\})" #(vector :constant %))
 (def-inline-parser parse-url #"(https?://[^ \r\n]+)" #(vector :url %))
 
-(defn parse-heading [[first-text :as texts]]
-  (if-let [[[_ heading]] (and (= 1 (count texts))
+(defn parse-header [[first-text :as texts]]
+  (if-let [[[_ header]] (and (= 1 (count texts))
                               (string? first-text)
                               (re-seq #"^(.+)~$" first-text))]
-    [[:heading heading]]
+    [[:header header]]
     texts))
 
 (defn parse-divider [[first-text :as texts]]
@@ -51,54 +51,47 @@
 
 (defn parse-text-line* [line]
   (->> [line]
-       parse-section-header
-       parse-divider
-       parse-heading
-
-       parse-code
-       parse-tag
-       parse-ref
-       parse-const
-       parse-url
+       parse-section-header parse-divider parse-header
+       parse-command parse-tag parse-ref parse-const parse-url
        (cons :text)
        vec))
 
 (defn- parse-text-line [state line]
   (cond
     (= ">" line)
-    [(assoc state :mode :code-block :codes [])]
+    [(assoc state :mode :example :examples [])]
 
     (str/ends-with? line " >")
-    [(assoc state :mode :code-block :codes [])
+    [(assoc state :mode :example :examples [])
      (parse-text-line* (subs line 0 (- (count line) 2)))]
 
     :else
     [nil (parse-text-line* line)]))
 
-(defn- parse-code-block-line [state line]
+(defn- parse-example-line [state line]
   (cond
-    ;; Explicit end of code-block
+    ;; Explicit end of example
     (= "<" line)
-    [(assoc state :mode :text :codes nil)
-     [:code-block (str/join "\n" (:codes state))]]
+    [(assoc state :mode :text :examples nil)
+     [:example (str/join "\n" (:examples state))]]
 
-    ;; Inside code-block
+    ;; Inside example
     (or (= "" line)
         (re-seq #"^\s+" line))
-    [(update state :codes conj line) nil]
+    [(update state :examples conj line) nil]
 
-    ;; Implicit end of code-block
+    ;; Implicit end of example
     :else
-    (let [new-state (assoc state :mode :text :codes nil)
+    (let [new-state (assoc state :mode :text :examples nil)
           [new-state' new-line] (parse-line new-state line)]
       [(merge new-state new-state')
-       (list [:code-block (str/join "\n" (:codes state))]
+       (list [:example (str/join "\n" (:examples state))]
              new-line)])))
 
 (defn- parse-line [state line]
   (case (:mode state)
     :text (parse-text-line state line)
-    :code-block (parse-code-block-line state line)
+    :example (parse-example-line state line)
     (throw (ex-info "Invalid line" {:state state :line line}))))
 
 (defn parse [reader]
@@ -112,7 +105,3 @@
                                              (conj % new-line))))))
            {:state {:mode :text} :result []}
            (line-seq reader))))
-
-
-
-
