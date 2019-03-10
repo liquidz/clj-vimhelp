@@ -1,4 +1,10 @@
 = clj-vimhelp
+:toc:
+:toc-placement: preamble
+:toclevels: 2
+
+// Need some preamble to get TOC:
+{empty}
 
 Vim help file parser/convertor written by Clojure.
 
@@ -9,7 +15,7 @@ Convert vim help file to HTML.
 === Usage
 
 ----
-clojure -Sdeps '{:deps {liquidz/clj-vimhelp {:git/url "https://github.com/liquidz/vim-help" :sha "FIXME"}}}' \
+clojure -Sdeps '{:deps {liquidz/clj-vimhelp {:git/url "https://github.com/liquidz/clj-vimhelp" :sha "a59bcf0026a909e842779ec475b260dd9498d4eb"}}}' \
     -m vimhelp.core <file1> <file2> ... <fileN> [OPTIONS]
 ----
 .Options
@@ -50,21 +56,26 @@ Parse vim help to to Clojure data structure.
 |===
 | Line category | Text category | Example
 
-| `:text` | `:tag` | \*tag*
-|         | `:ref` | \|tag\|
-|         | `:command` | \`command`
-|         | `:constant` | {const}
-|         | `:divider` | ==== +
+| `:text`    | `:tag`            | *tag*
+|            | `:ref`            | \|tag\|
+|            | `:command`        | `command`
+|            | `:constant`       | {const}
+|            | `:divider`        |
+====
 ----
-|         | `:section-header` | HEADER   \*section-tag*
-|         | `:header` | HEADER~
-|         | `:url` | https://example.com
-| `:example` |  |
+|            | `:section-header` | HEADER   *section-tag*
+|            | `:header`         | HEADER~
+|            | `:url`            | https://example.com
+| `:example` |                   |
 >
  hello
 <
 |===
 
+== Native image
+* GraalVM is required.
+* `$GRAALVM_HOME` must be defined.
+* Run `make native-image` to make native image.
 
 == License
 
