@@ -1,0 +1,83 @@
+= clj-vimhelp
+
+Vim help file parser/convertor written by Clojure.
+
+== Convertor
+
+Convert vim help file to HTML.
+
+=== Usage
+
+----
+clojure -Sdeps '{:deps {liquidz/clj-vimhelp {:git/url "https://github.com/liquidz/vim-help" :sha "FIXME"}}}' \
+    -m vimhelp.core <file1> <file2> ... <fileN> [OPTIONS]
+----
+.Options
+|===
+|Short | Long | Note | Default value
+
+| -c | --css URL             | CSS URL                | `[]`
+| -t | --title TITLE         | Help title             | no title
+| -s | --style STYLE         | CSS style rules        |
+| -o | --output OUTPUT       | Output directory       |
+| -w | --wrapper WRAPPER     | Body wrapper div class | container
+|    | --copyright COPYRIGHT | Copyright text         |
+| -v | --verbose             |                        |
+| -h | --help                |                        |
+|===
+
+
+
+
+== Parser
+
+Parse vim help to to Clojure data structure.
+
+=== Usage
+
+[source,clojure]
+----
+(require '[vimhelp.parser :as p]
+         '[clojure.java.io :as io])
+
+(with-open [r (io/reader "/path/to/vim/help/file")]
+  (p/parse r))
+----
+
+=== Parsed data structure
+
+[cols="a,a,l"]
+|===
+| Line category | Text category | Example
+
+| `:text` | `:tag` | \*tag*
+|         | `:ref` | \|tag\|
+|         | `:command` | \`command`
+|         | `:constant` | {const}
+|         | `:divider` | ==== +
+----
+|         | `:section-header` | HEADER   \*section-tag*
+|         | `:header` | HEADER~
+|         | `:url` | https://example.com
+| `:example` |  |
+>
+ hello
+<
+|===
+
+
+== License
+
+Copyright © 2019 https://twitter.com/uochan[Masashi Iizuka]
+
+This program and the accompanying materials are made available under the
+terms of the Eclipse Public License 2.0 which is available at
+http://www.eclipse.org/legal/epl-2.0.
+
+This Source Code may also be made available under the following Secondary
+Licenses when the conditions for such availability set forth in the Eclipse
+Public License, v. 2.0 are satisfied: GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or (at your
+option) any later version, with the GNU Classpath Exception which is available
+at https://www.gnu.org/software/classpath/license.html.
+
