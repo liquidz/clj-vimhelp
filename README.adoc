@@ -8,6 +8,8 @@
 
 Vim help file parser/convertor written by Clojure.
 
+image:https://img.shields.io/circleci/project/github/liquidz/clj-vimhelp/master.svg?logo=CircleCI["CircleCI", link="https://circleci.com/gh/liquidz/clj-vimhelp"]
+
 == Convertor
 
 Convert vim help file to HTML.
@@ -15,7 +17,7 @@ Convert vim help file to HTML.
 === Usage
 
 ----
-clojure -Sdeps '{:deps {liquidz/clj-vimhelp {:git/url "https://github.com/liquidz/clj-vimhelp" :sha "a59bcf0026a909e842779ec475b260dd9498d4eb"}}}' \
+clojure -Sdeps '{:deps {liquidz/clj-vimhelp {:git/url "https://github.com/liquidz/clj-vimhelp" :sha "4905d0b0af99ef82aa63967d4e3de6871bbea5c7"}}}' \
     -m vimhelp.core <file1> <file2> ... <fileN> [OPTIONS]
 ----
 .Options
@@ -91,4 +93,3 @@ Public License, v. 2.0 are satisfied: GNU General Public License as published by
 the Free Software Foundation, either version 2 of the License, or (at your
 option) any later version, with the GNU Classpath Exception which is available
 at https://www.gnu.org/software/classpath/license.html.
-
