@@ -31,6 +31,8 @@
    ["-w" "--wrapper WRAPPER" "Body wrapper div class"
     :default "container"]
    [nil "--copyright COPYRIGHT" "Copyright text"]
+   [nil "--blob BLOB" "Blob url"]
+   [nil "--show-navigation"]
    ["-v" "--verbose"]
    ["-h" "--help"]])
 
@@ -55,9 +57,11 @@
                                {} path-parsed-data-pairs)
                   opts (assoc options
                               :version version
-                              :tags tags)]
+                              :tags tags
+                              :paths arguments)]
               (doseq [[path parsed-data] path-parsed-data-pairs]
                 (let [output-path (cond->> (h/html-file-name path)
-                                    output (str output separator))]
+                                    output (str output separator))
+                      opts (assoc opts :path path)]
                   (log (format "Rendering: %s" output-path))
                   (spit output-path (h/render parsed-data opts))))))))

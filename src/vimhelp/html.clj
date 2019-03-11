@@ -69,22 +69,39 @@
 
 (defn render
   ([parsed-data] (render parsed-data {}))
-  ([parsed-data {:keys [title css wrapper style copyright version] :as opts}]
+  ([parsed-data {:keys [title style copyright path blob] :as opts}]
    (page/html5
     [:head
      [:meta {:charset "UTF-8"}]
      [:title title]
-     (for [href css]
+     (for [href (:css opts)]
        [:link {:rel "stylesheet" :href href}])
      (when style
        [:style {:type "text/css"} style])]
 
     [:body
-     [:div {:class wrapper}
+     [:header
+      [:h1.title title]
+
+      (when (:show-navigation opts)
+        [:nav.files
+         [:p.current (.getName (io/file path))]
+         [:ul
+          (for [path (:paths opts)]
+            [:li {:class (when (= path (:path opts)) "active")}
+             [:a {:href (html-file-name path)}
+              (.getName (io/file path))]])]])
+
+      (when (and path blob)
+        [:p.edit-link
+         [:a {:href (str (str/replace blob #"/$" "") "/" (.getName (io/file path)))}
+          "Edit this page"]])]
+
+     [:div {:class (:wrapper opts)}
       (map #(render* % opts) parsed-data)]
 
      [:footer
       (when copyright [:p.copyright copyright])
       [:p.vimhelp
        "Built by " [:a {:href "https://github.com/liquidz/clj-vimhelp"} "clj-vimhelp"]
-       " ver " version]]])))
+       " ver " (:version opts)]]])))
