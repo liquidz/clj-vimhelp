@@ -9,9 +9,11 @@
       (str/replace " " "&nbsp;")
       (str/replace "\t" "&nbsp;&nbsp;&nbsp;&nbsp;")))
 
-(defn html-file-name [path]
-  (str/replace (.getName (io/file path))
-               #"\.[^.]+$" ".html"))
+(defn html-file-name [index path]
+  (let [file-name (.getName (io/file path))]
+    (if (= index file-name)
+      "index.html"
+      (str/replace file-name #"\.[^.]+$" ".html"))))
 
 (defmulti render* (fn [line _] (first line)))
 (defmethod render* :default [x _] x)
@@ -69,22 +71,43 @@
 
 (defn render
   ([parsed-data] (render parsed-data {}))
-  ([parsed-data {:keys [title css wrapper style copyright version] :as opts}]
+  ([parsed-data {:keys [title style copyright path blob index] :as opts}]
    (page/html5
     [:head
      [:meta {:charset "UTF-8"}]
      [:title title]
-     (for [href css]
+     (for [href (:css opts)]
        [:link {:rel "stylesheet" :href href}])
      (when style
        [:style {:type "text/css"} style])]
 
     [:body
-     [:div {:class wrapper}
+     [:header
+      [:h1.title title]
+
+      (when (:show-navigation opts)
+        [:nav.files
+         [:p.current (.getName (io/file path))]
+         [:ul
+          (for [path (sort #(cond
+                              (and index (str/ends-with? %1 index)) -1
+                              (and index (str/ends-with? %2 index)) 1
+                              :else (compare %1 %2))
+                           (:paths opts))]
+            [:li {:class (when (= path (:path opts)) "active")}
+             [:a {:href (html-file-name index path)}
+              (.getName (io/file path))]])]])
+
+      (when (and path blob)
+        [:p.edit-link
+         [:a {:href (str (str/replace blob #"/$" "") "/" (.getName (io/file path)))}
+          "Edit this page"]])]
+
+     [:div {:class (:wrapper opts)}
       (map #(render* % opts) parsed-data)]
 
      [:footer
       (when copyright [:p.copyright copyright])
       [:p.vimhelp
        "Built by " [:a {:href "https://github.com/liquidz/clj-vimhelp"} "clj-vimhelp"]
-       " ver " version]]])))
+       " ver " (:version opts)]]])))
