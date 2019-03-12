@@ -9,9 +9,11 @@
       (str/replace " " "&nbsp;")
       (str/replace "\t" "&nbsp;&nbsp;&nbsp;&nbsp;")))
 
-(defn html-file-name [path]
-  (str/replace (.getName (io/file path))
-               #"\.[^.]+$" ".html"))
+(defn html-file-name [index path]
+  (let [file-name (.getName (io/file path))]
+    (if (= index file-name)
+      "index.html"
+      (str/replace file-name #"\.[^.]+$" ".html"))))
 
 (defmulti render* (fn [line _] (first line)))
 (defmethod render* :default [x _] x)
@@ -69,7 +71,7 @@
 
 (defn render
   ([parsed-data] (render parsed-data {}))
-  ([parsed-data {:keys [title style copyright path blob] :as opts}]
+  ([parsed-data {:keys [title style copyright path blob index] :as opts}]
    (page/html5
     [:head
      [:meta {:charset "UTF-8"}]
@@ -87,9 +89,13 @@
         [:nav.files
          [:p.current (.getName (io/file path))]
          [:ul
-          (for [path (:paths opts)]
+          (for [path (sort #(cond
+                              (and index (str/ends-with? %1 index)) -1
+                              (and index (str/ends-with? %2 index)) 1
+                              :else (compare %1 %2))
+                           (:paths opts))]
             [:li {:class (when (= path (:path opts)) "active")}
-             [:a {:href (html-file-name path)}
+             [:a {:href (html-file-name index path)}
               (.getName (io/file path))]])]])
 
       (when (and path blob)

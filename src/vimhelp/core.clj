@@ -31,15 +31,16 @@
    ["-w" "--wrapper WRAPPER" "Body wrapper div class"
     :default "container"]
    [nil "--copyright COPYRIGHT" "Copyright text"]
-   [nil "--blob BLOB" "Blob url"]
-   [nil "--show-navigation"]
+   [nil "--blob BLOB" "Blob URL"]
+   [nil "--index INDEX" "index file name"]
    ["-v" "--verbose"]
    ["-h" "--help"]])
 
 (defn -main [& args]
   (let [{:keys [arguments options summary errors]} (cli/parse-opts args cli-options)
-        {:keys [help verbose output]} options
-        log #(when verbose (println %))]
+        {:keys [help verbose output index]} options
+        log #(when verbose (println %))
+        html-file-name (partial h/html-file-name index)]
     (cond
       errors (doseq [e errors] (println e))
       help (println (str "Usage:\n" summary))
@@ -51,16 +52,17 @@
                                               arguments)
                   tags (reduce (fn [res [path parsed-data]]
                                  (->> (extract-tags parsed-data)
-                                      (map #(vector % (h/html-file-name path)))
+                                      (map #(vector % (html-file-name path)))
                                       (into {})
                                       (merge res)))
                                {} path-parsed-data-pairs)
                   opts (assoc options
                               :version version
                               :tags tags
-                              :paths arguments)]
+                              :paths arguments
+                              :show-navigation (> (count arguments) 1))]
               (doseq [[path parsed-data] path-parsed-data-pairs]
-                (let [output-path (cond->> (h/html-file-name path)
+                (let [output-path (cond->> (html-file-name path)
                                     output (str output separator))
                       opts (assoc opts :path path)]
                   (log (format "Rendering: %s" output-path))
