@@ -30,6 +30,8 @@ clojure -Sdeps '{:deps {liquidz/clj-vimhelp {:git/url "https://github.com/liquid
 | -o | --output OUTPUT       | Output directory       |
 | -w | --wrapper WRAPPER     | Body wrapper div class | container
 |    | --copyright COPYRIGHT | Copyright text         |
+|    | --blob BLOB           | Blob URL               |
+|    | --index INDEX         | Index file name        |
 | -v | --verbose             |                        |
 | -h | --help                |                        |
 |===

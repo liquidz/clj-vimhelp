@@ -32,7 +32,7 @@
     :default "container"]
    [nil "--copyright COPYRIGHT" "Copyright text"]
    [nil "--blob BLOB" "Blob URL"]
-   [nil "--index INDEX" "index file name"]
+   [nil "--index INDEX" "Index file name"]
    ["-v" "--verbose"]
    ["-h" "--help"]])
 
