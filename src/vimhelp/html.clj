@@ -91,7 +91,9 @@
 
       (when (:show-navigation opts)
         [:nav.files
-         [:p.current (.getName (io/file path))]
+         [:input#current-file {:type "checkbox"}]
+         [:label {:for "current-file"} (.getName (io/file path))]
+
          [:ul
           (for [path (sort #(cond
                               (and index (str/ends-with? %1 index)) -1
