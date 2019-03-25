@@ -2,7 +2,11 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as str]
             [hiccup.core :as hiccup]
-            [hiccup.page :as page]))
+            [hiccup.page :as page])
+  (:import  java.net.URLEncoder))
+
+(defn- url-encode [s]
+  (URLEncoder/encode s "UTF-8"))
 
 (defn- replace-spaces [s]
   (-> s
@@ -29,12 +33,12 @@
 
 (defmethod render* :tag
   [[_ tag-name] _]
-  [:a.tag {:name tag-name} (hiccup/h tag-name)])
+  [:a.tag {:name (url-encode tag-name)} (hiccup/h tag-name)])
 
 (defmethod render* :ref
   [[_ ref-name] {:keys [tags]}]
   [:a.ref {:class (when-not (contains? tags ref-name) "missing-tag")
-           :href (str (get tags ref-name) "#" ref-name)}
+           :href (str (get tags ref-name) "#" (url-encode ref-name))}
    (hiccup/h ref-name)])
 
 (defmethod render* :constant
@@ -65,7 +69,7 @@
   [[_ title tag] opts]
   (let [[_ tag-name] tag]
     [:p.section-header
-     [:a.section-link {:href (str "#" tag-name)} "@"]
+     [:a.section-link {:href (str "#" (url-encode tag-name))} "@"]
      [:span.section-title (-> title hiccup/h replace-spaces)]
      (render* tag opts)]))
 
