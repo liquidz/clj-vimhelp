@@ -1,6 +1,7 @@
 (ns vimhelp.html-test
-  (:require [clojure.test :as t]
-            [vimhelp.html :as sut]))
+  (:require
+   [clojure.test :as t]
+   [vimhelp.html :as sut]))
 
 (t/deftest render-tag-test
   (t/are [in out] (= out (sut/render* [:tag in] {}))

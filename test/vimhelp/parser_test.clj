@@ -1,9 +1,14 @@
 (ns vimhelp.parser-test
-  (:require [clojure.test :as t]
-            [vimhelp.parser :as sut])
-  (:import [java.io BufferedReader StringReader]))
+  (:require
+   [clojure.test :as t]
+   [vimhelp.parser :as sut])
+  (:import
+   (java.io
+    BufferedReader
+    StringReader)))
 
-(defn- parse [s]
+(defn- parse
+  [s]
   (with-open [r (BufferedReader. (StringReader. s))]
     (sut/parse r)))
 
@@ -58,7 +63,7 @@
         "foo\n>\n bar\n<\nbaz",    [[:text "foo"] [:example " bar"] [:text "baz"]]
         ">\n\tfoo\n\tbar\n<",      [[:example "\tfoo\n\tbar"]]
         ">\n\tfoo\n\tbar\n<\nbaz", [[:example "\tfoo\n\tbar"] [:text "baz"]]
-        ">\n<",                    [[:example ""] ]
+        ">\n<",                    [[:example ""]]
         "foo\n>\n<\nbar",          [[:text "foo"] [:example ""] [:text "bar"]]))
 
     (t/testing "ends with some texts"
@@ -90,5 +95,5 @@
 
   (t/testing "mismatched"
     (t/are [in out] (= (parse in) out)
-        ">\n foo",      []
-        "foo >\n barz", [[:text "foo"]])))
+      ">\n foo",      []
+      "foo >\n barz", [[:text "foo"]])))

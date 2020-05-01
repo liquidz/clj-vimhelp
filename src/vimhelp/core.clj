@@ -1,11 +1,12 @@
 (ns vimhelp.core
   (:gen-class)
-  (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [clojure.tools.cli :as cli]
-            [clojure.walk :as walk]
-            [vimhelp.html :as h]
-            [vimhelp.parser :as p]))
+  (:require
+   [clojure.java.io :as io]
+   [clojure.string :as str]
+   [clojure.tools.cli :as cli]
+   [clojure.walk :as walk]
+   [vimhelp.html :as h]
+   [vimhelp.parser :as p]))
 
 (def version
   (-> "version" io/resource slurp str/trim))
@@ -13,7 +14,8 @@
 (def separator
   (System/getProperty "file.separator"))
 
-(defn- extract-tags [parsed-data]
+(defn- extract-tags
+  [parsed-data]
   (let [tags (atom #{})]
     (walk/postwalk
      #(do (when (and (vector? %) (= :tag (first %)))
@@ -36,7 +38,8 @@
    ["-v" "--verbose"]
    ["-h" "--help"]])
 
-(defn -main [& args]
+(defn -main
+  [& args]
   (let [{:keys [arguments options summary errors]} (cli/parse-opts args cli-options)
         {:keys [help verbose output index]} options
         log #(when verbose (println %))

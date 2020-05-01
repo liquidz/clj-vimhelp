@@ -1,19 +1,24 @@
 (ns vimhelp.html
-  (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [hiccup.core :as hiccup]
-            [hiccup.page :as page])
-  (:import  java.net.URLEncoder))
+  (:require
+   [clojure.java.io :as io]
+   [clojure.string :as str]
+   [hiccup.core :as hiccup]
+   [hiccup.page :as page])
+  (:import
+   java.net.URLEncoder))
 
-(defn- url-encode [s]
+(defn- url-encode
+  [s]
   (URLEncoder/encode s "UTF-8"))
 
-(defn- replace-spaces [s]
+(defn- replace-spaces
+  [s]
   (-> s
       (str/replace " " "&nbsp;")
       (str/replace "\t" "&nbsp;&nbsp;&nbsp;&nbsp;")))
 
-(defn html-file-name [index path]
+(defn html-file-name
+  [index path]
   (let [file-name (.getName (io/file path))]
     (if (= index file-name)
       "index.html"
