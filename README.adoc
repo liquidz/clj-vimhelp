@@ -8,7 +8,8 @@
 
 Vim help file parser/convertor written by Clojure.
 
-image:https://img.shields.io/circleci/project/github/liquidz/clj-vimhelp/master.svg?logo=CircleCI["CircleCI", link="https://circleci.com/gh/liquidz/clj-vimhelp"]
+image:https://github.com/liquidz/clj-vimhelp/workflows/test/badge.svg["GitHub Actions for test workflow", link="https://github.com/liquidz/clj-vimhelp/actions?query=workflow%3Atest"]
+image:https://github.com/liquidz/clj-vimhelp/workflows/lint/badge.svg["GitHub Actions for lint workflow", link="https://github.com/liquidz/clj-vimhelp/actions?query=workflow%3Alint"]
 
 == Convertor
 
