@@ -1,0 +1,105 @@
+name: native_image
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+
+jobs:
+  linux-amd64:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install GraalVM
+        run: |
+          cd /tmp
+          if ! [ -d /tmp/graalvm-ce-java11-19.3.1 ]; then
+            curl -O -sL https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-19.3.1/graalvm-ce-java11-linux-amd64-19.3.1.tar.gz
+
+            tar xzf graalvm-ce-java11-linux-amd64-19.3.1.tar.gz
+          fi
+      - name: Build native image
+        env:
+          GRAALVM_HOME: /tmp/graalvm-ce-java11-19.3.1
+        run: |
+          ${GRAALVM_HOME}/bin/gu install native-image
+          make native-image
+      - name: Rename
+        run: mv target/vimhelp vimhelp.linux-amd64
+      - uses: actions/upload-artifact@v2
+        with:
+          name: vimhelp.linux-amd64
+          path: ./vimhelp.linux-amd64
+
+  darwin-amd64:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install clojure
+        run: brew install clojure
+      - name: Install GraalVM
+        run: |
+          cd /tmp
+          if ! [ -d /tmp/graalvm-ce-java11-19.3.1 ]; then
+            curl -O -sL https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-19.3.1/graalvm-ce-java11-darwin-amd64-19.3.1.tar.gz
+            tar xzf graalvm-ce-java11-darwin-amd64-19.3.1.tar.gz
+          fi
+      - name: Build native image
+        env:
+          GRAALVM_HOME: /tmp/graalvm-ce-java11-19.3.1/Contents/Home
+        run: |
+          ${GRAALVM_HOME}/bin/gu install native-image
+          make native-image
+      - name: Rename
+        run: mv target/vimhelp vimhelp.darwin-amd64
+      - uses: actions/upload-artifact@v2
+        with:
+          name: vimhelp.darwin-amd64
+          path: ./vimhelp.darwin-amd64
+
+  create-release:
+    needs: [linux-amd64, darwin-amd64]
+    if: contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/create-release@v1.0.1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          body: |
+            released
+          draft: false
+          prerelease: false
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: vimhelp.linux-amd64
+          path: tmp
+      - uses: actions/upload-release-asset@v1.0.2
+        id: upload-linux-release-asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./tmp/vimhelp.linux-amd64
+          asset_name: vimhelp.linux-amd64
+          asset_content_type: application/octet-stream
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: vimhelp.darwin-amd64
+          path: tmp
+      - uses: actions/upload-release-asset@v1.0.2
+        id: upload-darwin-release-asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./tmp/vimhelp.darwin-amd64
+          asset_name: vimhelp.darwin-amd64
+          asset_content_type: application/octet-stream
