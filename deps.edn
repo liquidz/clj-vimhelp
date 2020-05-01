@@ -4,14 +4,14 @@
  :deps
  {;; for GraalVM
   ;; https://dev.clojure.org/jira/browse/CLJ-1472
-  org.clojure/clojure {:mvn/version "1.9.0"}
+  org.clojure/clojure {:mvn/version "1.10.1"}
   hiccup {:mvn/version "1.0.5"}
-  org.clojure/tools.cli {:mvn/version "0.4.1"}}
+  org.clojure/tools.cli {:mvn/version "1.0.194"}}
 
  :aliases
  {:dev
   {:extra-paths ["test"]
-   :extra-deps {lambdaisland/kaocha {:mvn/version "0.0-389"}}}
+   :extra-deps {lambdaisland/kaocha {:mvn/version "1.0-612"}}}
 
   :test
   {:main-opts ["-m" "kaocha.runner"]}
@@ -25,7 +25,7 @@
                                   :sha "498baa963e914fd817dbf33ea251729efd0c8f95"}}}
 
   :ancient
-  {:extra-deps {olical/depot {:mvn/version "1.5.0"}}
+  {:extra-deps {olical/depot {:mvn/version "RELEASE"}}
    :main-opts ["-m" "depot.outdated.main"]}
   }
 
