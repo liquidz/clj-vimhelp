@@ -9,8 +9,13 @@ ancient:
 repl:
 	iced repl --force-clojure-cli -A:dev
 
-target/vimhelp:
-	mkdir -p target && clojure -A:native-image
+pom.xml: deps.edn
+	clojure -Spom
+
+target/vimhelp.jar: pom.xml
+	clojure -A:uberjar
+
+uberjar: target/vimhelp.jar
 
 native-image: target/vimhelp
 

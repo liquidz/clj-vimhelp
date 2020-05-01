@@ -16,13 +16,9 @@
   :test
   {:main-opts ["-m" "kaocha.runner"]}
 
-  :native-image
-  {:main-opts ["-m clj.native-image vimhelp.core"
-               "--report-unsupported-elements-at-runtime"
-               "-H:Name=target/vimhelp"]
-
-   :extra-deps {clj.native-image {:git/url "https://github.com/taylorwood/clj.native-image.git"
-                                  :sha "498baa963e914fd817dbf33ea251729efd0c8f95"}}}
+  :uberjar {:extra-deps {seancorfield/depstar {:mvn/version "RELEASE"}}
+            :main-opts ["-m" "hf.depstar.uberjar" "target/vimhelp.jar"
+                        "-C" "-m" "vimhelp.core"]}
 
   :ancient
   {:extra-deps {olical/depot {:mvn/version "RELEASE"}}
