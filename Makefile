@@ -46,6 +46,12 @@ uninstall: /usr/local/bin/vimhelp
 clean:
 	\rm -rf .cpcache classes target
 
+lint-clj-kondo:
+	clj-kondo --lint src:test
+lint-cljstyle:
+	cljstyle check
+lint: lint-clj-kondo lint-cljstyle
+
 .vim-iced:
 	git clone https://github.com/liquidz/vim-iced .vim-iced
 

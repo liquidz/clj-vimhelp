@@ -9,6 +9,7 @@ pom.xml.asc
 bin
 tags
 /.cpcache
+/.clj-kondo/.cache
 *.html
 .eastwood
 .vim-iced
