@@ -1,0 +1,9 @@
+{
+ :linters {:unresolved-symbol
+           {:exclude [parse-tag
+                      parse-ref
+                      parse-command
+                      parse-const
+                      parse-url]}}
+ }
+
