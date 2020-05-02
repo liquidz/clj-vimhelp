@@ -11,6 +11,16 @@ Vim help file parser/convertor written by Clojure.
 image:https://github.com/liquidz/clj-vimhelp/workflows/test/badge.svg["GitHub Actions for test workflow", link="https://github.com/liquidz/clj-vimhelp/actions?query=workflow%3Atest"]
 image:https://github.com/liquidz/clj-vimhelp/workflows/lint/badge.svg["GitHub Actions for lint workflow", link="https://github.com/liquidz/clj-vimhelp/actions?query=workflow%3Alint"]
 
+== Getting Started
+Download binary from releases.
+
+[source,sh]
+----
+# Download latest vimhelp to the current working directory
+curl -L https://raw.githubusercontent.com/liquidz/clj-vimhelp/master/script/download | bash
+./vimhelp --help
+----
+
 == Convertor
 
 Convert vim help file to HTML.
@@ -84,7 +94,7 @@ Parse vim help to to Clojure data structure.
 
 == License
 
-Copyright © 2019 https://twitter.com/uochan[Masashi Iizuka]
+Copyright © 2019-2020 https://twitter.com/uochan[Masashi Iizuka]
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at

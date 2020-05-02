@@ -1,0 +1,10 @@
+VERSION=$(curl -sL https://raw.githubusercontent.com/liquidz/clj-vimhelp/master/resources/version)
+
+if [ "$(uname)" = 'Darwin' ]; then
+    OS_TYPE='darwin'
+else
+    OS_TYPE='linux'
+fi
+
+curl -sfLo ./vimhelp https://github.com/liquidz/clj-vimhelp/releases/download/${VERSION}/vimhelp.${OS_TYPE}-amd64
+chmod +x ./vimhelp
