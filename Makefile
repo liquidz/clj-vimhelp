@@ -1,4 +1,4 @@
-.PHONY: test ancient repl uberjar native-image install uninstall clean
+.PHONY: test ancient repl uberjar native-image install uninstall release clean
 
 test:
 	clojure -A:dev:test
@@ -42,6 +42,9 @@ install: target/vimhelp
 
 uninstall: /usr/local/bin/vimhelp
 	\rm -f /usr/local/bin/vimhelp
+
+release:
+	./script/release
 
 clean:
 	\rm -rf .cpcache classes target
