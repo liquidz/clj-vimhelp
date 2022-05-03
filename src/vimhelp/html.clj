@@ -2,8 +2,7 @@
   (:require
    [clojure.java.io :as io]
    [clojure.string :as str]
-   [hiccup2.core :as hiccup]
-   [hiccup.page :as page])
+   [hiccup2.core :as hiccup])
   (:import
    java.net.URLEncoder))
 
@@ -89,44 +88,46 @@
 (defn render
   ([parsed-data] (render parsed-data {}))
   ([parsed-data {:keys [title style copyright path blob index] :as opts}]
-   (page/html5
-    [:head
-     [:meta {:charset "UTF-8"}]
-     [:title title]
-     (for [href (:css opts)]
-       [:link {:rel "stylesheet" :href href}])
-     (when style
-       [:style {:type "text/css"} style])]
+   (str "<!DOCTYPE html>"
+        (hiccup/html
+         [:html
+          [:head
+           [:meta {:charset "UTF-8"}]
+           [:title title]
+           (for [href (:css opts)]
+             [:link {:rel "stylesheet" :href href}])
+           (when style
+             [:style {:type "text/css"} (hiccup/raw style)])]
 
-    [:body
-     [:header
-      [:h1.title title]
+          [:body
+           [:header
+            [:h1.title title]
 
-      (when (:show-navigation opts)
-        [:nav.files
-         [:input#current-file {:type "checkbox"}]
-         [:label {:for "current-file"} (.getName (io/file path))]
+            (when (:show-navigation opts)
+              [:nav.files
+               [:input#current-file {:type "checkbox"}]
+               [:label {:for "current-file"} (.getName (io/file path))]
 
-         [:ul
-          (for [path (sort #(cond
-                              (and index (str/ends-with? %1 index)) -1
-                              (and index (str/ends-with? %2 index)) 1
-                              :else (compare %1 %2))
-                           (:paths opts))]
-            [:li {:class (when (= path (:path opts)) "active")}
-             [:a {:href (html-file-name index path)}
-              (.getName (io/file path))]])]])
+               [:ul
+                (for [path (sort #(cond
+                                   (and index (str/ends-with? %1 index)) -1
+                                   (and index (str/ends-with? %2 index)) 1
+                                   :else (compare %1 %2))
+                                 (:paths opts))]
+                  [:li {:class (when (= path (:path opts)) "active")}
+                   [:a {:href (html-file-name index path)}
+                    (.getName (io/file path))]])]])
 
-      (when (and path blob)
-        [:p.edit-link
-         [:a {:href (str (str/replace blob #"/$" "") "/" (.getName (io/file path)))}
-          "Edit this page"]])]
+            (when (and path blob)
+              [:p.edit-link
+               [:a {:href (str (str/replace blob #"/$" "") "/" (.getName (io/file path)))}
+                "Edit this page"]])]
 
-     [:div {:class (:wrapper opts)}
-      (map #(render* % opts) parsed-data)]
+           [:div {:class (:wrapper opts)}
+            (map #(render* % opts) parsed-data)]
 
-     [:footer
-      (when copyright [:p.copyright copyright])
-      [:p.vimhelp
-       "Built by " [:a {:href "https://github.com/liquidz/clj-vimhelp"} "clj-vimhelp"]
-       " ver " (:version opts)]]])))
+           [:footer
+            (when copyright [:p.copyright copyright])
+            [:p.vimhelp
+             "Built by " [:a {:href "https://github.com/liquidz/clj-vimhelp"} "clj-vimhelp"]
+             " ver " (:version opts)]]]]))))
