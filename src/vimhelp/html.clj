@@ -7,7 +7,7 @@
    java.net.URLEncoder))
 
 (defn- url-encode
-  [s]
+  [^String s]
   (URLEncoder/encode s "UTF-8"))
 
 (defn- replace-spaces
@@ -111,9 +111,9 @@
 
                [:ul
                 (for [path (sort #(cond
-                                   (and index (str/ends-with? %1 index)) -1
-                                   (and index (str/ends-with? %2 index)) 1
-                                   :else (compare %1 %2))
+                                    (and index (str/ends-with? %1 index)) -1
+                                    (and index (str/ends-with? %2 index)) 1
+                                    :else (compare %1 %2))
                                  (:paths opts))]
                   [:li {:class (when (= path (:path opts)) "active")}
                    [:a {:href (html-file-name index path)}

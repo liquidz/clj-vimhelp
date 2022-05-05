@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - build-test
     tags:
       - '*'
 
@@ -10,29 +11,21 @@ jobs:
   linux-amd64:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Install clojure
-        run: |
-          curl -O https://download.clojure.org/install/linux-install-1.10.1.536.sh
-          chmod +x linux-install-1.10.1.536.sh
-          sudo ./linux-install-1.10.1.536.sh
-      - name: Install GraalVM
-        run: |
-          cd /tmp
-          if ! [ -d /tmp/graalvm-ce-java11-19.3.1 ]; then
-            curl -O -sL https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-19.3.1/graalvm-ce-java11-linux-amd64-19.3.1.tar.gz
-
-            tar xzf graalvm-ce-java11-linux-amd64-19.3.1.tar.gz
-          fi
+      - uses: actions/checkout@v3
+      - uses: DeLaGuardo/setup-clojure@master
+        with:
+          cli: latest
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2
+            /tmp/.graalvm
+          key: v1-linux-native-image-${{ hashFiles('Makefile', 'deps.edn') }}
       - name: Build native image
-        env:
-          GRAALVM_HOME: /tmp/graalvm-ce-java11-19.3.1
-        run: |
-          ${GRAALVM_HOME}/bin/gu install native-image
-          make native-image
+        run: make native-image
       - name: Rename
         run: mv target/vimhelp vimhelp.linux-amd64
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@master
         with:
           name: vimhelp.linux-amd64
           path: ./vimhelp.linux-amd64
@@ -40,25 +33,21 @@ jobs:
   darwin-amd64:
     runs-on: macOS-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Install clojure
-        run: brew install clojure
-      - name: Install GraalVM
-        run: |
-          cd /tmp
-          if ! [ -d /tmp/graalvm-ce-java11-19.3.1 ]; then
-            curl -O -sL https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-19.3.1/graalvm-ce-java11-darwin-amd64-19.3.1.tar.gz
-            tar xzf graalvm-ce-java11-darwin-amd64-19.3.1.tar.gz
-          fi
+      - uses: actions/checkout@v3
+      - uses: DeLaGuardo/setup-clojure@master
+        with:
+          cli: latest
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.m2
+            /tmp/.graalvm
+          key: v1-mac-native-image-${{ hashFiles('Makefile', 'deps.edn') }}
       - name: Build native image
-        env:
-          GRAALVM_HOME: /tmp/graalvm-ce-java11-19.3.1/Contents/Home
-        run: |
-          ${GRAALVM_HOME}/bin/gu install native-image
-          make native-image
+        run: make native-image
       - name: Rename
         run: mv target/vimhelp vimhelp.darwin-amd64
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@master
         with:
           name: vimhelp.darwin-amd64
           path: ./vimhelp.darwin-amd64
@@ -68,8 +57,8 @@ jobs:
     if: contains(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/create-release@v1.0.1
+      - uses: actions/checkout@v3
+      - uses: actions/create-release@v1
         id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -81,11 +70,11 @@ jobs:
           draft: false
           prerelease: false
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@master
         with:
           name: vimhelp.linux-amd64
           path: tmp
-      - uses: actions/upload-release-asset@v1.0.2
+      - uses: actions/upload-release-asset@v1
         id: upload-linux-release-asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -95,11 +84,11 @@ jobs:
           asset_name: vimhelp.linux-amd64
           asset_content_type: application/octet-stream
 
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@master
         with:
           name: vimhelp.darwin-amd64
           path: tmp
-      - uses: actions/upload-release-asset@v1.0.2
+      - uses: actions/upload-release-asset@v1
         id: upload-darwin-release-asset
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

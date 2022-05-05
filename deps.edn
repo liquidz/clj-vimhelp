@@ -1,29 +1,30 @@
-{
- :paths ["src" "resources"]
+{:paths ["src" "resources"]
 
  :deps
  {;; for GraalVM
   ;; https://dev.clojure.org/jira/browse/CLJ-1472
-  org.clojure/clojure {:mvn/version "1.10.1"}
+  org.clojure/clojure {:mvn/version "1.11.1"}
   hiccup/hiccup {:mvn/version "2.0.0-alpha2"}
-  org.clojure/tools.cli {:mvn/version "1.0.194"}}
+  org.clojure/tools.cli {:mvn/version "1.0.206"}
+  ;; GraalVM
+  com.github.clj-easy/graal-build-time {:mvn/version "0.1.4"}}
 
  :aliases
  {:dev
   {:extra-paths ["test"]
-   :extra-deps {lambdaisland/kaocha {:mvn/version "1.0-612"}}}
+   :extra-deps {lambdaisland/kaocha {:mvn/version "1.66.1034"}}}
 
   :test
   {:main-opts ["-m" "kaocha.runner"]}
 
-  :uberjar {:extra-deps {seancorfield/depstar {:mvn/version "RELEASE"}}
-            :main-opts ["-m" "hf.depstar.uberjar" "target/vimhelp.jar"
-                        "-C" "-m" "vimhelp.core"]}
+  :build
+  {:deps {io.github.clojure/tools.build {:git/tag "v0.8.1" :git/sha "7d40500"}
+          slipset/deps-deploy {:mvn/version "0.2.0"}}
+   :ns-default build}
 
-  :ancient
-  {:extra-deps {olical/depot {:mvn/version "RELEASE"}}
-   :main-opts ["-m" "depot.outdated.main"]}
-  }
+  :outdated
+  {:extra-deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}
+   :main-opts ["-m" "antq.core" "--upgrade"]}}
 
- :jvm-opts ["-Dclojure.compiler.direct-linking=true"]
- }
+ :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}
+
