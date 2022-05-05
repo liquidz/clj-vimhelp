@@ -10,19 +10,20 @@
   [s]
   (URLEncoder/encode s "UTF-8"))
 
-(defn replace-spaces
+(defn- replace-spaces
   [s]
-  (->> s
-       (partition-by #(case % \space 0 \tab 0 1))
-       (map (fn [char-seq]
-              (if (#{\space \tab} (first char-seq))
-                (->> char-seq
-                     (map #(case %
-                             \space "&nbsp;"
-                             \tab "&nbsp;&nbsp;&nbsp;&nbsp;"))
-                     (apply str)
-                     hiccup/raw)
-                (apply str char-seq))))))
+  (let [spaces #{\space \tab}]
+    (->> s
+         (partition-by #(contains? spaces %))
+         (map (fn [char-seq]
+                (if (contains? spaces (first char-seq))
+                  (->> char-seq
+                       (map #(case %
+                               \space "&nbsp;"
+                               \tab "&nbsp;&nbsp;&nbsp;&nbsp;"))
+                       (apply str)
+                       hiccup/raw)
+                  (apply str char-seq)))))))
 
 (defn html-file-name
   [index path]

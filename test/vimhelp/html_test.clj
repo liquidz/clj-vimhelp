@@ -9,7 +9,7 @@
                  (hiccup/raw "&nbsp;&nbsp;&nbsp;&nbsp;") "wow"
                  (hiccup/raw "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;")
                  "very" (hiccup/raw "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;") "cool")
-           (sut/replace-spaces "hi  there\twow\t\tvery \tcool"))))
+           (#'sut/replace-spaces "hi  there\twow\t\tvery \tcool"))))
 
 (t/deftest render-tag-test
   (t/are [in out] (= out (sut/render* [:tag in] {}))
