@@ -2,8 +2,7 @@
   (:require
    [clojure.java.io :as io]
    [clojure.string :as str]
-   [hiccup.core :as hiccup]
-   [hiccup.page :as page])
+   [hiccup2.core :as hiccup])
   (:import
    java.net.URLEncoder))
 
@@ -13,9 +12,18 @@
 
 (defn- replace-spaces
   [s]
-  (-> s
-      (str/replace " " "&nbsp;")
-      (str/replace "\t" "&nbsp;&nbsp;&nbsp;&nbsp;")))
+  (let [spaces #{\space \tab}]
+    (->> s
+         (partition-by #(contains? spaces %))
+         (map (fn [char-seq]
+                (if (contains? spaces (first char-seq))
+                  (->> char-seq
+                       (map #(case %
+                               \space "&nbsp;"
+                               \tab "&nbsp;&nbsp;&nbsp;&nbsp;"))
+                       (apply str)
+                       hiccup/raw)
+                  (apply str char-seq)))))))
 
 (defn html-file-name
   [index path]
@@ -32,39 +40,39 @@
   (->> (if (= [""] elements) [" "] elements)
        (map #(if (vector? %)
                (render* % opts)
-               (-> % hiccup/h replace-spaces)))
+               (replace-spaces %)))
        (cons :p)
        vec))
 
 (defmethod render* :tag
   [[_ tag-name] _]
-  [:a.tag {:name (url-encode tag-name)} (hiccup/h tag-name)])
+  [:a.tag {:name (url-encode tag-name)} tag-name])
 
 (defmethod render* :ref
   [[_ ref-name] {:keys [tags]}]
   [:a.ref {:class (when-not (contains? tags ref-name) "missing-tag")
            :href (str (get tags ref-name) "#" (url-encode ref-name))}
-   (hiccup/h ref-name)])
+   ref-name])
 
 (defmethod render* :constant
   [[_ constant-name] _]
-  [:span.constant (hiccup/h constant-name)])
+  [:span.constant constant-name])
 
 (defmethod render* :header
   [[_ header-text] _]
-  [:span.header (hiccup/h header-text)])
+  [:span.header header-text])
 
 (defmethod render* :command
   [[_ command] _]
-  [:code.command (hiccup/h command)])
+  [:code.command command])
 
 (defmethod render* :example
   [[_ example] _]
-  [:pre.example [:code (hiccup/h example)]])
+  [:pre.example [:code example]])
 
 (defmethod render* :url
   [[_ url] _]
-  [:a.url {:href url} (hiccup/h url)])
+  [:a.url {:href url} url])
 
 (defmethod render* :divider
   [[_ text] _]
@@ -75,50 +83,52 @@
   (let [[_ tag-name] tag]
     [:p.section-header
      [:a.section-link {:href (str "#" (url-encode tag-name))} "@"]
-     [:span.section-title (-> title hiccup/h replace-spaces)]
+     (into [:span.section-title] (replace-spaces title))
      (render* tag opts)]))
 
 (defn render
   ([parsed-data] (render parsed-data {}))
   ([parsed-data {:keys [title style copyright path blob index] :as opts}]
-   (page/html5
-    [:head
-     [:meta {:charset "UTF-8"}]
-     [:title title]
-     (for [href (:css opts)]
-       [:link {:rel "stylesheet" :href href}])
-     (when style
-       [:style {:type "text/css"} style])]
+   (str "<!DOCTYPE html>"
+        (hiccup/html
+         [:html
+          [:head
+           [:meta {:charset "UTF-8"}]
+           [:title title]
+           (for [href (:css opts)]
+             [:link {:rel "stylesheet" :href href}])
+           (when style
+             [:style {:type "text/css"} (hiccup/raw style)])]
 
-    [:body
-     [:header
-      [:h1.title title]
+          [:body
+           [:header
+            [:h1.title title]
 
-      (when (:show-navigation opts)
-        [:nav.files
-         [:input#current-file {:type "checkbox"}]
-         [:label {:for "current-file"} (.getName (io/file path))]
+            (when (:show-navigation opts)
+              [:nav.files
+               [:input#current-file {:type "checkbox"}]
+               [:label {:for "current-file"} (.getName (io/file path))]
 
-         [:ul
-          (for [path (sort #(cond
-                              (and index (str/ends-with? %1 index)) -1
-                              (and index (str/ends-with? %2 index)) 1
-                              :else (compare %1 %2))
-                           (:paths opts))]
-            [:li {:class (when (= path (:path opts)) "active")}
-             [:a {:href (html-file-name index path)}
-              (.getName (io/file path))]])]])
+               [:ul
+                (for [path (sort #(cond
+                                   (and index (str/ends-with? %1 index)) -1
+                                   (and index (str/ends-with? %2 index)) 1
+                                   :else (compare %1 %2))
+                                 (:paths opts))]
+                  [:li {:class (when (= path (:path opts)) "active")}
+                   [:a {:href (html-file-name index path)}
+                    (.getName (io/file path))]])]])
 
-      (when (and path blob)
-        [:p.edit-link
-         [:a {:href (str (str/replace blob #"/$" "") "/" (.getName (io/file path)))}
-          "Edit this page"]])]
+            (when (and path blob)
+              [:p.edit-link
+               [:a {:href (str (str/replace blob #"/$" "") "/" (.getName (io/file path)))}
+                "Edit this page"]])]
 
-     [:div {:class (:wrapper opts)}
-      (map #(render* % opts) parsed-data)]
+           [:div {:class (:wrapper opts)}
+            (map #(render* % opts) parsed-data)]
 
-     [:footer
-      (when copyright [:p.copyright copyright])
-      [:p.vimhelp
-       "Built by " [:a {:href "https://github.com/liquidz/clj-vimhelp"} "clj-vimhelp"]
-       " ver " (:version opts)]]])))
+           [:footer
+            (when copyright [:p.copyright copyright])
+            [:p.vimhelp
+             "Built by " [:a {:href "https://github.com/liquidz/clj-vimhelp"} "clj-vimhelp"]
+             " ver " (:version opts)]]]]))))
