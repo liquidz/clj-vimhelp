@@ -17,7 +17,7 @@ Download binary from releases.
 [source,sh]
 ----
 # Download latest vimhelp to the current working directory
-curl -L https://raw.githubusercontent.com/liquidz/clj-vimhelp/master/script/download | bash
+curl -L https://raw.githubusercontent.com/liquidz/clj-vimhelp/main/script/download | bash
 ./vimhelp --help
 ----
 

@@ -1,4 +1,4 @@
-VERSION=$(curl -sL https://raw.githubusercontent.com/liquidz/clj-vimhelp/master/resources/version)
+VERSION=$(curl -sL https://raw.githubusercontent.com/liquidz/clj-vimhelp/main/resources/version)
 
 if [ "$(uname)" = 'Darwin' ]; then
     OS_TYPE='darwin'
