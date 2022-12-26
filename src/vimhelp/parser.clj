@@ -32,12 +32,12 @@
 (def-inline-parser parse-const #"(\{[^{}]+\})" #(vector :constant %))
 (def-inline-parser parse-url #"(https?://[^ \r\n]+)" #(vector :url %))
 
-(defn parse-header
+(defn parse-heading
   [[first-text :as texts]]
-  (if-let [[[_ header]] (and (= 1 (count texts))
-                             (string? first-text)
-                             (re-seq #"^(.+)~$" first-text))]
-    [[:header header]]
+  (if-let [[[_ heading]] (and (= 1 (count texts))
+                              (string? first-text)
+                              (re-seq #"^(.+)~$" first-text))]
+    [[:heading heading]]
     texts))
 
 (defn parse-divider
@@ -48,18 +48,18 @@
     [[:divider first-text]]
     texts))
 
-(defn parse-section-header
+(defn parse-section-heading
   [[first-text :as texts]]
   (if-let [[[_ section-title section-tag]] (and (= 1 (count texts))
                                                 (string? first-text)
                                                 (re-seq #"^([A-Z. -]+)(\*[^*]+\*)$" first-text))]
-    [[:section-header section-title (second (parse-tag [section-tag]))]]
+    [[:section-heading section-title (second (parse-tag [section-tag]))]]
     texts))
 
 (defn parse-text-line*
   [line]
   (->> [line]
-       parse-section-header parse-divider parse-header
+       parse-section-heading parse-divider parse-heading
        parse-command parse-tag parse-ref parse-const parse-url
        (cons :text)
        vec))
