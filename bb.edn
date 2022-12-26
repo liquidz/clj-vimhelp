@@ -1,0 +1,3 @@
+{:deps {com.github.liquidz/clj-vimhelp {:local/root "."}}
+ :paths ["."]
+ :bbin/bin {vimhelp  {:ns-default vimhelp.core}}}
