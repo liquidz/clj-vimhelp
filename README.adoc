@@ -12,7 +12,8 @@ image:https://github.com/liquidz/clj-vimhelp/workflows/test/badge.svg["GitHub Ac
 image:https://github.com/liquidz/clj-vimhelp/workflows/lint/badge.svg["GitHub Actions for lint workflow", link="https://github.com/liquidz/clj-vimhelp/actions?query=workflow%3Alint"]
 
 == Getting Started
-Download binary from releases.
+
+https://github.com/babashka/bbin[babashka/bbin]
 
 [source,sh]
 ----
@@ -28,26 +29,25 @@ Convert vim help file to HTML.
 === Usage
 
 ----
-clojure -Sdeps '{:deps {liquidz/clj-vimhelp {:git/url "https://github.com/liquidz/clj-vimhelp" :sha "38dea58d0516f8f6bbc424da14300c831a824242"}}}' \
+clojure -Sdeps '{:deps {com.github.liquidz/clj-vimhelp {:sha "1c3407d8f5fb2c5134ce99b5292b2e0af766a5a8"}}}' \
     -m vimhelp.core <file1> <file2> ... <fileN> [OPTIONS]
 ----
 .Options
 |===
 |Short | Long | Note | Default value
 
-| -c | --css URL             | CSS URL                | `[]`
-| -t | --title TITLE         | Help title             | no title
-| -s | --style STYLE         | CSS style rules        |
-| -o | --output OUTPUT       | Output directory       |
-| -w | --wrapper WRAPPER     | Body wrapper div class | container
-|    | --copyright COPYRIGHT | Copyright text         |
-|    | --blob BLOB           | Blob URL               |
-|    | --index INDEX         | Index file name        |
-| -v | --verbose             |                        |
-| -h | --help                |                        |
+| -c | --css URL or content    | CSS URL or contents    | `[]`
+| -s | --script URL or content | JS URL or contents     | `[]`
+| -k | --class K=V             | Extra class names      | `{}`
+| -t | --title TITLE           | Help title             | no title
+| -o | --output OUTPUT         | Output directory       |
+|    | --copyright COPYRIGHT   | Copyright text         |
+|    | --blob BLOB             | Blob URL               |
+|    | --index INDEX           | Index file name        |
+|    | --config CONFIG         | Config file name       |
+| -v | --verbose               |                        |
+| -h | --help                  |                        |
 |===
-
-
 
 
 == Parser
@@ -87,14 +87,9 @@ Parse vim help to to Clojure data structure.
 <
 |===
 
-== Native image
-* GraalVM is required.
-* `$GRAALVM_HOME` must be defined.
-* Run `make native-image` to make native image.
-
 == License
 
-Copyright © 2019-2020 https://twitter.com/uochan[Masashi Iizuka]
+Copyright © 2019-2022 https://twitter.com/uochan[Masashi Iizuka]
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
