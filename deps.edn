@@ -5,7 +5,7 @@
   ;; https://dev.clojure.org/jira/browse/CLJ-1472
   org.clojure/clojure {:mvn/version "1.11.1"}
   hiccup/hiccup {:mvn/version "2.0.0-alpha2"}
-  org.clojure/tools.cli {:mvn/version "1.0.206"}
+  org.clojure/tools.cli {:mvn/version "1.0.214"}
   ;; GraalVM
   com.github.clj-easy/graal-build-time {:mvn/version "0.1.4"}}
 
