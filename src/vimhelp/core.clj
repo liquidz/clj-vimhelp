@@ -1,6 +1,7 @@
 (ns vimhelp.core
   (:gen-class)
   (:require
+   [clojure.edn :as edn]
    [clojure.java.io :as io]
    [clojure.string :as str]
    [clojure.tools.cli :as cli]
@@ -27,14 +28,21 @@
 (def cli-options
   [["-c" "--css URL" "CSS URL"
     :default [] :assoc-fn (fn [m k v] (update m k conj v))]
+   ["-s" "--script URL" "SCRIPT URL"
+    :default [] :assoc-fn (fn [m k v] (update m k conj v))]
+   ["-k" "--class K=V" "FIXME"
+    :default {} :assoc-fn (fn [m k v]
+                            (let [[base-class extra-class] (str/split v #"=" 2)]
+                              (update m k (fn [x]
+                                            (update x (keyword base-class) #(if (seq %)
+                                                                              (str % " " extra-class)
+                                                                              extra-class))))))]
    ["-t" "--title TITLE" "Help title" :default "no title"]
-   ["-s" "--style STYLE" "CSS style rules"]
    ["-o" "--output OUTPUT" "Output directory"]
-   ["-w" "--wrapper WRAPPER" "Body wrapper div class"
-    :default "container"]
    [nil "--copyright COPYRIGHT" "Copyright text"]
    [nil "--blob BLOB" "Blob URL"]
    [nil "--index INDEX" "Index file name"]
+   [nil "--config CONFIG" "Confie file name"]
    ["-v" "--verbose"]
    ["-h" "--help"]])
 
@@ -59,7 +67,11 @@
                                       (into {})
                                       (merge res)))
                                {} path-parsed-data-pairs)
-                  opts (assoc options
+                  config (when-let [config (:config options)]
+                           (edn/read-string (slurp config)))
+                  opts (assoc (if config
+                                config
+                                options)
                               :version version
                               :tags tags
                               :paths arguments
