@@ -1,0 +1,11 @@
+{:lib com.github.liquidz/clj-vimhelp
+ :description "Vim help file parser/convertor written by Clojure"
+ :version "2.0.{{git/commit-count}}"
+ :documents [{:file "resources/version"
+              :action :create
+              :text "{{version}}"}
+             {:file "README.adoc"
+              :match "com\\.github\\.liquidz/clj-vimhelp"
+              :action :replace
+              :text "clojure -Sdeps '{:deps {com.github.liquidz/clj-vimhelp {:sha \"{{git/head-long-sha}}\"}}}' \\"}]
+ :github-actions? true}
